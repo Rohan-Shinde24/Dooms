@@ -1,0 +1,6 @@
+func greet_user(str name) {
+    print("Welcome from the imported module,", name, "!");
+    return 1;
+}
+
+str module_version = "v1.0.0";

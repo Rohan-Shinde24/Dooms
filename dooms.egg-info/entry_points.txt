@@ -1,0 +1,2 @@
+[console_scripts]
+dooms = dooms.cli:main

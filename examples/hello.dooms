@@ -1,0 +1,102 @@
+/// 
+    DOOMS Test Script
+    This script tests all language features built so far:
+    Variables, Types, Math, Loops, Conditionals, and Functions!
+///
+
+// 0. Modules and Imports
+import "examples/my_module.dooms" as ext;
+print("External module version:", ext.module_version);
+ext.greet_user("DOOMS User");
+
+// 1. Classes and OOP
+class Person {
+    func init(str name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    func greet() {
+        print("Hello, I am", this.name, "and I am", this.age, "years old.");
+    }
+}
+
+any alice = Person("Alice", 25);
+alice.greet();
+
+// 2. Variables and Types
+int a = 10
+str b = "hello"
+boo c = true
+any d = 42
+
+print("Initial variables:", a, b, c, d)
+
+// 2. Math and Arithmetic
+int math_result = (a * 2) + 5;
+print("Math Result:", math_result)
+
+// 3. Conditionals (if/else)
+if (math_result > 20) {
+    print("Result is greater than 20!")
+} else {
+    print("Result is 20 or less!")
+}
+
+// 4. Loops (while) and block scope
+int count = 0
+while (count < 3) {
+    print("Loop Count:", count)
+    count = count + 1
+}
+
+// 5. Custom Functions and Recursion
+func factorial(int n) {
+    if (n < 2) {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+int fact_val = factorial(5)
+print("5! is:", fact_val)
+
+// 6. Arrays and Methods
+int numbers = [1, 2, 3]
+numbers.push(4);
+print("Numbers array:", numbers);
+
+[int, str] user = [100, "Alice"];
+print("Tuple type:", user);
+ 
+any limited = [(3)]
+limited.append("one")
+limited.append("two")
+limited.insert(0, "zero")
+print("Limited array:", limited)
+limited.pop()
+print("After pop:", limited)
+
+// 7. Dictionaries and Collections
+any person = {
+    "name": "DOOMS",
+    "version": 1
+};
+person.set("language", "Python");
+print("Dictionary keys:", person.keys());
+print("Person Name:", person.name);
+print("Person :", person);
+print("Person Version:", person["version"]);
+
+// 8. String Operations
+str greeting = "hello dooms";
+print("Uppercase:", greeting.upper());
+print("Length:", greeting.length());
+print("Split:", greeting.split(" "));
+
+// 9. Interactive Input and Coercion
+print("----- DOOMS INTERACTIVE MODE -----");
+str your_name = input("What is your name? ");
+int your_age = input("How old are you? ");
+print("Hello", your_name, "!");
+print("In 10 years, you will be:", your_age + 10);
+
