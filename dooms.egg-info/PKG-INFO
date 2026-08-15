@@ -9,19 +9,72 @@ Classifier: Operating System :: OS Independent
 Requires-Python: >=3.11
 Description-Content-Type: text/markdown
 
-# DOOMS Programming Language
+<div align="center">
+  <h1>DOOMS</h1>
+  <p><b>A custom, strict-typed, dynamically evaluated scripting language.</b></p>
+  <p>
+    <a href="https://pypi.org/project/dooms/"><img src="https://img.shields.io/pypi/v/dooms.svg" alt="PyPI Version"></a>
+    <a href="https://github.com/Rohan-Shinde24/Dooms"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+  </p>
+</div>
 
-DOOMS is a custom, strict-typed, dynamically evaluated scripting language. 
-It features a robust type-checker, custom functions, arrays, dictionaries, and more!
+---
 
-## Roadmap & Status
+**DOOMS** is a robust and flexible scripting language built in Python. It features a complete interpreter pipeline (Lexer, Parser, AST, Interpreter) and is designed to enforce strict type checking while maintaining the dynamic, expressive feel of modern scripting languages.
 
-Below is the current roadmap. We are currently finishing Phase 8!
+## 🚀 Features
 
-- [x] **Phase 1**: Basic interpreter pipeline (Lexer, Parser, AST, Interpreter) and `print`
-- [x] **Phase 2**: Explicitly Typed Variables (`int`, `str`, `boo`, `any`)
-- [x] **Phase 3**: Arithmetic (`+`, `-`, `*`, `/`)
-- [x] **Phase 4**: Conditionals (`if` / `else`)
+- **Strict Typing:** Variables must be declared with their types (`int`, `str`, `boo`, `any`).
+- **Object-Oriented:** First-class support for Classes and `this` binding without needing a `new` keyword.
+- **Modules System:** Built-in `import "file.dooms" as ns` support.
+- **Rich Data Structures:** Arrays (`[1, 2]`), Tuples (`[int, str]`), and Dictionaries (`{ "key": "value" }`).
+- **Built-in Methods:** Arrays and Strings come with useful native methods (`.push()`, `.pop()`, `.length()`, `.split()`).
+- **Control Flow:** Robust Block Scoping (`{}`), Functions, and Loops (`while`, `if`/`else`).
+- **Graceful Error Handling:** Beautiful, Rust-style error tracing in the terminal pointing exactly to your syntax mistakes.
+
+## 📦 Installation
+
+DOOMS is available on PyPI! You can install it globally using `pip`:
+
+```bash
+pip install dooms
+```
+
+## 💻 Usage
+
+Once installed, the `dooms` command will be available anywhere in your terminal.
+
+```bash
+dooms run your_script.dooms
+```
+
+### Quick Example (`hello.dooms`)
+
+```dooms
+// Classes and Objects
+class Person {
+    func init(str name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    func greet() {
+        print("Hello, I am", this.name, "and I am", this.age, "years old.");
+    }
+}
+
+any user = Person("Alice", 25);
+user.greet();
+
+// Strict typing and arrays
+[int, str] my_tuple = [100, "Alice"];
+print("Tuple type:", my_tuple);
+```
+
+## 🗺️ Roadmap & Status
+
+We are currently working on transitioning to a compiled stack-based Virtual Machine!
+
+- [x] **Phase 1-4**: Basic Interpreter, Types, Arithmetic, Conditionals
 - [x] **Phase 5**: Block Scoping (`{...}`) and Loops (`while`, `<`, `>`, `==`)
 - [x] **Phase 6**: Custom Functions
 - [x] **Phase 7**: Arrays / Lists
@@ -30,32 +83,7 @@ Below is the current roadmap. We are currently finishing Phase 8!
 - [x] **Phase 10**: Classes (OOP)
 - [ ] **Phase 11**: Bytecode Compilation (Virtual Machine)
 
-## Features Overview
-
-- Explicit Typing (`int`, `str`, `boo`, `any`)
-- Arithmetic operators (`+`, `-`, `*`, `/`)
-- Comparison operators (`<`, `>`, `==`)
-- Loops (`while`)
-- Custom Functions with explicit typing (`func add(int a) { return a + 1; }`)
-- Arrays (`[1, 2]`), Tuple Types (`[int, str]`), and Array Methods (`.push()`, `.pop()`)
-- Dictionaries (`{}`) with methods (`.get()`, `.keys()`) and index access (`obj["key"]`)
-- String Operations (`.length()`, `.upper()`, `.split()`)
-- Built-in `print()` and `input()` with automatic type coercion
-- Modules System (`import "file.dooms"` and `import "file.dooms" as name`)
-- Classes (OOP) with `class` and `this` binding
-
-## Installation
-
-DOOMS is available on PyPI! You can install it globally using `pip`:
-
-```bash
-pip install dooms
-```
-
-## Running DOOMS
-
-Once installed, you can use the `dooms` command anywhere in your terminal:
-
-```bash
-dooms run examples/hello.dooms
-```
+---
+<div align="center">
+  <i>D o o m s</i>
+</div>

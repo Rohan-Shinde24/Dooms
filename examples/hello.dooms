@@ -100,3 +100,59 @@ int your_age = input("How old are you? ");
 print("Hello", your_name, "!");
 print("In 10 years, you will be:", your_age + 10);
 
+// 10. Object-Oriented Programming (OOP)
+print("----- 10. OBJECT-ORIENTED PROGRAMMING -----");
+
+abstract class Animal {
+    protected str name;
+    
+    public func init(str n) {
+        this.name = n;
+    }
+    
+    // Abstraction: abstract methods must be implemented by subclasses
+    abstract func speak();
+    
+    public func getName() {
+        return this.name;
+    }
+}
+
+// Inheritance: Dog extends Animal
+class Dog extends Animal {
+    // Encapsulation: private field
+    private boo is_good_boy;
+    
+    public func init(str n, boo good) {
+        // Polymorphism: calling superclass init
+        super.init(n);
+        this.is_good_boy = good;
+    }
+    
+    // Overriding abstract method
+    public func speak() {
+        print(this.name + " says woof!");
+    }
+    
+    public func isGood() {
+        return this.is_good_boy;
+    }
+}
+
+class Cat extends Animal {
+    public func init(str n) {
+        super.init(n);
+    }
+    
+    public func speak() {
+        print(this.name + " says meow!");
+    }
+}
+
+any myDog = Dog("Buddy", true);
+print("Dog name:", myDog.getName());
+myDog.speak();
+print("Is Buddy a good boy?", myDog.isGood());
+
+any myCat = Cat("Whiskers");
+myCat.speak();
