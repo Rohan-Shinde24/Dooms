@@ -50,7 +50,24 @@ class ImportStatement(Statement):
 @dataclass
 class ClassDeclaration(Statement):
     name: Identifier
-    methods: List[FunctionDeclaration]
+    superclass: Identifier | None
+    methods: List['MethodDeclaration']
+    fields: List['FieldDeclaration']
+    is_abstract: bool
+
+@dataclass
+class MethodDeclaration(Statement):
+    name: Identifier
+    params: List[dict]
+    body: BlockStatement | None
+    modifier: TokenType
+    is_abstract: bool
+
+@dataclass
+class FieldDeclaration(Statement):
+    name: Identifier
+    var_type: Any
+    modifier: TokenType
 
 @dataclass
 class Program:

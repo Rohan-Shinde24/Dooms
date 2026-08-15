@@ -2,7 +2,7 @@ import sys
 from .environment import Environment
 from .errors import DoomsRuntimeError
 from dooms.tree.statements import ExpressionStatement, VariableDeclaration, BlockStatement, WhileStatement, IfStatement, FunctionDeclaration, ReturnStatement, ImportStatement, ClassDeclaration
-from dooms.tree.expressions import Literal, Identifier, AssignmentExpression, BinaryExpression, CallExpression, ArrayLiteral, MemberExpression, DictionaryLiteral, IndexExpression, ThisExpression, SetExpression
+from dooms.tree.expressions import Literal, Identifier, AssignmentExpression, BinaryExpression, CallExpression, ArrayLiteral, MemberExpression, DictionaryLiteral, IndexExpression, ThisExpression, SetExpression, SuperExpression
 from dooms.lexer.token_type import TokenType
 from .function import DoomsFunction
 from .errors import ReturnException, DoomsRuntimeError
@@ -12,6 +12,11 @@ from .module import DoomsModule
 from .classes import DoomsClass, DoomsInstance
 from .string_methods import get_string_method
 import os
+
+class DoomsSuper:
+    def __init__(self, instance, superclass):
+        self.instance = instance
+        self.superclass = superclass
 
 def builtin_print(args):
     # Print boolean as true/false to match JS output format
@@ -95,13 +100,23 @@ class Interpreter:
             elif statement.else_branch is not None:
                 self.execute(statement.else_branch)
         elif isinstance(statement, ClassDeclaration):
-            # Evaluate methods but don't bind them yet
+            superclass = None
+            if statement.superclass:
+                superclass = self.evaluate(statement.superclass)
+                if not isinstance(superclass, DoomsClass):
+                    raise DoomsRuntimeError("Superclass must be a class.")
+
+            fields = {}
+            for field in statement.fields:
+                fields[field.name.name] = field
+                
             methods = {}
+            dooms_class = DoomsClass(statement.name.name, methods, superclass, fields, statement.is_abstract)
+            
             for method in statement.methods:
-                function = DoomsFunction(method, self.environment)
+                function = DoomsFunction(method, self.environment, dooms_class)
                 methods[method.name.name] = function
             
-            dooms_class = DoomsClass(statement.name.name, methods)
             self.environment.define(statement.name.name, dooms_class, TokenType.ANY_TYPE)
         elif isinstance(statement, FunctionDeclaration):
             function = DoomsFunction(statement, self.environment)
@@ -161,8 +176,20 @@ class Interpreter:
 
         if isinstance(expr, MemberExpression):
             obj = self.evaluate(expr.obj)
-            if isinstance(obj, DoomsInstance):
-                return obj.get_value(expr.property.name)
+            
+            current_class = None
+            try:
+                current_class = self.environment.get("__current_class__")
+            except DoomsRuntimeError:
+                pass
+                
+            if isinstance(obj, DoomsSuper):
+                method = obj.superclass.find_method(expr.property.name)
+                if not method:
+                    raise DoomsRuntimeError(f"Undefined property '{expr.property.name}' on superclass.")
+                return method.bind(obj.instance)
+            elif isinstance(obj, DoomsInstance):
+                return obj.get_value(expr.property.name, current_class)
             elif isinstance(obj, DoomsArray):
                 return obj.get_method(expr.property.name)
             elif isinstance(obj, DoomsDictionary):
@@ -185,6 +212,16 @@ class Interpreter:
         if isinstance(expr, ThisExpression):
             return self.environment.get("this")
 
+        if isinstance(expr, SuperExpression):
+            try:
+                current_class = self.environment.get("__current_class__")
+            except DoomsRuntimeError:
+                raise DoomsRuntimeError("Cannot use 'super' outside of a class.")
+            if not current_class.superclass:
+                raise DoomsRuntimeError(f"Class '{current_class.name}' has no superclass.")
+            this_instance = self.environment.get("this")
+            return DoomsSuper(this_instance, current_class.superclass)
+
         if isinstance(expr, Identifier):
             return self.environment.get(expr.name)
 
@@ -195,9 +232,16 @@ class Interpreter:
 
         if isinstance(expr, SetExpression):
             obj = self.evaluate(expr.obj)
+            
+            current_class = None
+            try:
+                current_class = self.environment.get("__current_class__")
+            except DoomsRuntimeError:
+                pass
+                
             if isinstance(obj, DoomsInstance):
                 val = self.evaluate(expr.value)
-                obj.set_value(expr.property.name, val)
+                obj.set_value(expr.property.name, val, current_class)
                 return val
             elif isinstance(obj, DoomsDictionary):
                 val = self.evaluate(expr.value)

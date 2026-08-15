@@ -1,7 +1,7 @@
 from dooms.lexer.token_type import TokenType
 from dooms.interpreter.errors import DoomsParserError
-from dooms.tree.statements import Program, ExpressionStatement, VariableDeclaration, BlockStatement, WhileStatement, IfStatement, FunctionDeclaration, ReturnStatement, ImportStatement, ClassDeclaration
-from dooms.tree.expressions import Identifier, Literal, CallExpression, BinaryExpression, AssignmentExpression, ArrayLiteral, MemberExpression, DictionaryLiteral, IndexExpression, ThisExpression, SetExpression
+from dooms.tree.statements import Program, ExpressionStatement, VariableDeclaration, BlockStatement, WhileStatement, IfStatement, FunctionDeclaration, ReturnStatement, ImportStatement, ClassDeclaration, MethodDeclaration, FieldDeclaration
+from dooms.tree.expressions import Identifier, Literal, CallExpression, BinaryExpression, AssignmentExpression, ArrayLiteral, MemberExpression, DictionaryLiteral, IndexExpression, ThisExpression, SetExpression, SuperExpression
 
 class Parser:
     def __init__(self, lexer):
@@ -46,7 +46,7 @@ class Parser:
             return self.parse_return_statement()
         if self.current_token.type == TokenType.IMPORT:
             return self.parse_import_statement()
-        if self.current_token.type == TokenType.CLASS:
+        if self.current_token.type in [TokenType.CLASS, TokenType.ABSTRACT]:
             return self.parse_class_declaration()
         if self.current_token.type in [TokenType.INT_TYPE, TokenType.STRING_TYPE, TokenType.BOOLEAN_TYPE, TokenType.ANY_TYPE, TokenType.LEFT_BRACKET]:
             return self.parse_variable_declaration()
@@ -104,17 +104,76 @@ class Parser:
         return FunctionDeclaration(name, params, body)
 
     def parse_class_declaration(self):
+        is_abstract = False
+        if self.match(TokenType.ABSTRACT):
+            is_abstract = True
+            
         self.eat(TokenType.CLASS)
         name_token = self.eat(TokenType.IDENTIFIER)
         name = Identifier(name_token.value)
         
+        superclass = None
+        if self.match(TokenType.EXTENDS):
+            super_token = self.eat(TokenType.IDENTIFIER)
+            superclass = Identifier(super_token.value)
+            
         self.eat(TokenType.LEFT_BRACE)
         methods = []
+        fields = []
+        
         while self.current_token.type != TokenType.RIGHT_BRACE and self.current_token.type != TokenType.EOF:
-            methods.append(self.parse_function_declaration())
+            modifier = TokenType.PUBLIC
+            if self.current_token.type in [TokenType.PUBLIC, TokenType.PRIVATE, TokenType.PROTECTED]:
+                modifier = self.current_token.type
+                self.eat(modifier)
+            
+            method_is_abstract = False
+            if self.match(TokenType.ABSTRACT):
+                method_is_abstract = True
+                
+            if self.current_token.type == TokenType.FUNC:
+                methods.append(self.parse_method_declaration(modifier, method_is_abstract))
+            else:
+                fields.append(self.parse_field_declaration(modifier))
+                
         self.eat(TokenType.RIGHT_BRACE)
         
-        return ClassDeclaration(name, methods)
+        return ClassDeclaration(name, superclass, methods, fields, is_abstract)
+
+    def parse_method_declaration(self, modifier, is_abstract):
+        self.eat(TokenType.FUNC)
+        name_token = self.eat(TokenType.IDENTIFIER)
+        name = Identifier(name_token.value)
+        
+        self.eat(TokenType.LEFT_PAREN)
+        params = []
+        if self.current_token.type != TokenType.RIGHT_PAREN:
+            var_type = self.eat(self.current_token.type).type
+            param_name = self.eat(TokenType.IDENTIFIER)
+            params.append({'name': Identifier(param_name.value), 'var_type': var_type})
+            
+            while self.current_token.type == TokenType.COMMA:
+                self.eat(TokenType.COMMA)
+                var_type = self.eat(self.current_token.type).type
+                param_name = self.eat(TokenType.IDENTIFIER)
+                params.append({'name': Identifier(param_name.value), 'var_type': var_type})
+                
+        self.eat(TokenType.RIGHT_PAREN)
+        
+        body = None
+        if is_abstract:
+            self.eat(TokenType.SEMICOLON)
+        else:
+            body = self.parse_block()
+            
+        return MethodDeclaration(name, params, body, modifier, is_abstract)
+
+    def parse_field_declaration(self, modifier):
+        var_type = self.parse_type()
+        name_token = self.eat(TokenType.IDENTIFIER)
+        name = Identifier(name_token.value)
+        self.eat(TokenType.SEMICOLON)
+        return FieldDeclaration(name, var_type, modifier)
 
     def parse_return_statement(self):
         self.eat(TokenType.RETURN)
@@ -260,6 +319,10 @@ class Parser:
         if self.current_token.type == TokenType.THIS:
             self.eat(TokenType.THIS)
             return ThisExpression()
+            
+        if self.current_token.type == TokenType.SUPER:
+            self.eat(TokenType.SUPER)
+            return SuperExpression()
             
         if self.current_token.type == TokenType.TRUE:
             self.eat(TokenType.TRUE)

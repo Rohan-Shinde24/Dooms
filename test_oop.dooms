@@ -1,0 +1,50 @@
+abstract class Animal {
+    protected str name;
+    
+    public func init(str n) {
+        this.name = n;
+    }
+    
+    abstract func speak();
+    
+    public func getName() {
+        return this.name;
+    }
+}
+
+class Dog extends Animal {
+    private boo is_good_boy;
+    
+    public func init(str n, boo good) {
+        super.init(n);
+        this.is_good_boy = good;
+    }
+    
+    public func speak() {
+        print(this.name + " says woof!");
+    }
+    
+    public func isGood() {
+        return this.is_good_boy;
+    }
+}
+
+class Cat extends Animal {
+    public func init(str n) {
+        super.init(n);
+    }
+    
+    public func speak() {
+        print(this.name + " says meow!");
+    }
+}
+
+any myDog = Dog("Buddy", true);
+myDog.speak();
+print(myDog.isGood());
+
+any myCat = Cat("Whiskers");
+myCat.speak();
+
+print(myDog.is_good_boy);
+Animal a = Animal("Test");

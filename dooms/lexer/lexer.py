@@ -18,6 +18,12 @@ KEYWORDS = {
     'as': TokenType.AS,
     'class': TokenType.CLASS,
     'this': TokenType.THIS,
+    'extends': TokenType.EXTENDS,
+    'super': TokenType.SUPER,
+    'public': TokenType.PUBLIC,
+    'private': TokenType.PRIVATE,
+    'protected': TokenType.PROTECTED,
+    'abstract': TokenType.ABSTRACT,
 }
 
 class Lexer:

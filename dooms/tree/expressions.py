@@ -59,3 +59,7 @@ class SetExpression(Expression):
 class AssignmentExpression(Expression):
     name: Identifier
     value: Expression
+
+@dataclass
+class SuperExpression(Expression):
+    pass
