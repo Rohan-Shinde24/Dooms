@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: dooms
-Version: 1.0.0
+Version: 1.1.0
 Summary: A custom strictly-typed dynamic scripting language
 Author-email: DOOMS Team <team@dooms.lang>
 Classifier: Programming Language :: Python :: 3
